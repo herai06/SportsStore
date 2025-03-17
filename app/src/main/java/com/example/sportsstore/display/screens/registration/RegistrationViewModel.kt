@@ -1,22 +1,23 @@
 package com.example.sportsstore.display.screens.registration
 
+
+import android.app.AlertDialog
+import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
-class RegistrationViewModel : ViewModel() {
-    private val _emailError = MutableStateFlow<String?>(null)
-    val emailError: StateFlow<String?> = _emailError
-
-    fun validateEmail(email: String) {
-        viewModelScope.launch {
-            if (!email.contains("@")) {
-                _emailError.value = "Некорректный адрес электронной почты"
-            } else {
-                _emailError.value = null
-            }
-        }
+class RegistrationViewModel(private val context: Context) : ViewModel() {
+    private val emailRegex = "^[a-z0-9]+@[a-z0-9]+\\.[a-z]{3,}$".toRegex()
+    fun isValidEmail(email: String): Boolean {
+        return emailRegex.matches(email)
     }
+
+    fun showInvalidEmailDialog() {
+        AlertDialog.Builder(context)
+            .setTitle("Некорректный электронный адрес")
+            .setMessage("Пожалуйста, проверьте формат электронного адреса.")
+            .setPositiveButton("OK") { _, _ -> }
+            .show()
+    }
+
+
 }
