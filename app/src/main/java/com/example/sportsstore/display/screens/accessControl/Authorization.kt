@@ -1,9 +1,8 @@
-package com.example.sportsstore.display.view.screens
+package com.example.sportsstore.display.screens.authorization
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,34 +13,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -50,40 +41,37 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import com.example.sportsstore.R
-import com.example.sportsstore.display.screens.registration.RegistrationViewModel
+import com.example.sportsstore.display.screens.registration.AccessControlViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-
-@ExperimentalMaterial3Api
-class RegistrationClass(private val context: Context) {
-//class RegistrationClass() {
-
-    private val fontRaleway = FontFamily(
+class AuthorizationClass(private val context: Context) {
+    // подключение шрифта
+    val fontRaleway = FontFamily(
         Font(R.font.raleway_regular, FontWeight.Normal),
         Font(R.font.raleway_medium, FontWeight.Medium),
         Font(R.font.raleway_bold, FontWeight.Bold)
     )
+    val textColor = Color(red = 112, green = 123, blue = 129, alpha = 255)
 
-    private val textColor = Color(red = 112, green = 123, blue = 129, alpha = 255)
-
-//    @Preview
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Registration() {
-        val viewModel = RegistrationViewModel(context)
-        val nameUser = remember { mutableStateOf("") }
-        val emailUser = remember { mutableStateOf("") }
-        val passwordUser = remember { mutableStateOf("") }
-        var checkedState by remember { mutableStateOf(false) }
-        var isButtonEnabled by remember { mutableStateOf(false) }
-        var passwordVisibility by remember { mutableStateOf(false) }
-        val icon = if (passwordVisibility)
+    fun Authorization(navController: NavController) {
+        val viewModel = AccessControlViewModel(context) // подключение viewModel
+        val flagUser = remember { mutableStateOf(false) } // флаг, отвечающий за успех авторизации и переход на следующий экран
+        val emailUser = remember { mutableStateOf("") } // переменная для значения email
+        val passwordUser = remember { mutableStateOf("") } // переменная для значения пароля
+        var passwordVisibility by remember { mutableStateOf(false) } // показ пароля
+        val icon = if (passwordVisibility) // устанока картинки в зависимости от показа пароля
             painterResource(id = R.drawable.ic_visibility_off)
         else
             painterResource(id = R.drawable.ic_visibility)
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -93,74 +81,27 @@ class RegistrationClass(private val context: Context) {
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 40.dp)
             )
             {
+                // колонка с заголовком
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(bottom = 50.dp)
                 ) {
                     Text(
-                        text = "Регистрация",
+                        text = "Привет!",
                         fontFamily =  fontRaleway,
                         fontWeight = FontWeight.Normal,
                         fontSize = 32.sp,
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
                     Text(
-                        text = "Заполните Свои данные",
+                        text = "Заполните Свои Данные",
                         fontFamily =  fontRaleway,
                         fontWeight = FontWeight.Normal,
                         fontSize = 16.sp,
                         color = textColor
                     )
                 }
-                Column(
-                    modifier = Modifier.padding(bottom = 10.dp)
-                )
-                {
-                    Text(
-                        text = "Ваше имя",
-                        fontFamily =  fontRaleway,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp
-                    )
-                    OutlinedTextField(
-                        value = nameUser.value,
-                        onValueChange = { newText -> nameUser.value = newText },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp)
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = 10.dp,
-                                    topEnd = 10.dp,
-                                    bottomEnd = 10.dp,
-                                    bottomStart = 10.dp,
-                                )
-                            )
-                            .background(color = Color(247, 247, 249, 255)),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent, // Удаление рамок
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        textStyle = TextStyle(
-                            color = Color.Black,
-                            fontFamily =  fontRaleway,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp,
-                        ),
-                        placeholder = {
-                            Text("xxxxxxxx",
-                                color = textColor,
-                                fontFamily =  fontRaleway,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(0.dp).fillMaxWidth()
-                            )
-                        },
-                        singleLine = true
-                    )
-                }
-
+                // колонка с полем для ввода email
                 Column(
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
@@ -187,7 +128,7 @@ class RegistrationClass(private val context: Context) {
                             )
                             .background(color = Color(247, 247, 249, 255)),
                         colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent, // Удаление рамок
+                            containerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent
                         ),
@@ -209,6 +150,7 @@ class RegistrationClass(private val context: Context) {
                         singleLine = true
                     )
                 }
+                // колонка с полем для ввода пароля
                 Column(
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
@@ -228,7 +170,7 @@ class RegistrationClass(private val context: Context) {
                             }) {
                                 Icon(
                                     painter = icon,
-                                    contentDescription = "Visibility Icon"
+                                    contentDescription = "скрыть/показать"
                                 )
                             }
                         },
@@ -250,7 +192,7 @@ class RegistrationClass(private val context: Context) {
                             )
                             .background(color = Color(247, 247, 249, 255)),
                         colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.Transparent, // Удаление рамок
+                            containerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent
                         ),
@@ -264,49 +206,44 @@ class RegistrationClass(private val context: Context) {
                     )
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-                    Checkbox(
-                        checked = checkedState,
-                        onCheckedChange = {
-                            checkedState = it
-                            isButtonEnabled = it
-                        },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = Color(0xFF87CEEB)
-                        )
-                    )
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
-                        "Даю согласие на обработку персональных данных",
-                        fontSize = 14.sp,
-                        color = textColor,
+                        "Восстановить",
                         fontFamily =  fontRaleway,
                         fontWeight = FontWeight.Normal,
-                        lineHeight = 16.sp,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.padding(bottom = 15.dp)
+                        fontSize = 12.sp
                     )
                 }
-                Button(
+                // кнопка для авторизации
+                Button (
                     onClick = {
-                        if (viewModel.isValidEmail(emailUser.value)) {
+                        if (emailUser.value.isNotEmpty() && passwordUser.value.isNotEmpty()) {
+                            if (viewModel.IsValidEmail(emailUser.value)) { // проверка на корректный ввод email
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val flag = viewModel.AuthorizationUser(emailUser.value, passwordUser.value) // авторизация пользователя
+                                flagUser.value = flag
+                                if (flagUser.value == true) {
+//                                navController.navigate("MainPage")
+                                }
+                            }
+                            } else {
+                                viewModel.ShowInvalidEmailDialog() // отображение диалогового окна с ошибкой ввода email
+                            }
+                        } else {
+                            viewModel.ShowEmptyFieldsDialog() // отображение диалогового окна с ошибкой пустых полей
+                        }
 
-                        }
-                        else{
-                            viewModel.showInvalidEmailDialog()
-                        }
                     },
-                    enabled = isButtonEnabled,
                     modifier = Modifier.fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(13.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF87CEEB)),
                 ) {
                     Text(
-                        "Зарегистрироваться",
+                        "Войти",
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp,
                         fontFamily =  fontRaleway,
@@ -314,6 +251,7 @@ class RegistrationClass(private val context: Context) {
                     )
                 }
             }
+            // строка для перехода на страницу регистрации
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -323,30 +261,24 @@ class RegistrationClass(private val context: Context) {
             )
             {
                 Text(
-                    text = "Есть аккаунт?",
+                    text = "Вы впервые?",
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
                     fontFamily =  fontRaleway,
                     modifier = Modifier.padding(end = 5.dp)
                 )
                 Text (
-                    text = "Войти",
+                    text = "Создать",
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     fontFamily =  fontRaleway,
-//                    modifier = Modifier.clickable(
-//                        onClick = {
-//                            // Здесь указываем переход на другую страницу
-//                            navController.navigate("route_to_another_screen")
-//                        }
-//                    )
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            navController.navigate("Registration")
+                        }
+                    )
                 )
             }
         }
     }
 }
-
-
-
-
-

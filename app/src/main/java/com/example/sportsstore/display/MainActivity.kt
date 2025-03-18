@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.sportsstore.display.view.navigation.NavigationClass
 import com.example.sportsstore.display.view.screens.RegistrationClass
 import com.example.sportsstore.ui.theme.SportsStoreTheme
 
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SportsStoreTheme {
-                RegistrationClass(this).Registration()
+                NavigationClass(this).Navigation()
             }
         }
     }
