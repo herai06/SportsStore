@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +64,7 @@ class AuthorizationClass(private val context: Context) {
     @Composable
     fun Authorization(navController: NavController) {
         val viewModel = AccessControlViewModel(context) // подключение viewModel
+        val coroutineScope = rememberCoroutineScope()
         val flagUser = remember { mutableStateOf(false) } // флаг, отвечающий за успех авторизации и переход на следующий экран
         val emailUser = remember { mutableStateOf("") } // переменная для значения email
         val passwordUser = remember { mutableStateOf("") } // переменная для значения пароля
@@ -222,13 +224,13 @@ class AuthorizationClass(private val context: Context) {
                     onClick = {
                         if (emailUser.value.isNotEmpty() && passwordUser.value.isNotEmpty()) {
                             if (viewModel.IsValidEmail(emailUser.value)) { // проверка на корректный ввод email
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val flag = viewModel.AuthorizationUser(emailUser.value, passwordUser.value) // авторизация пользователя
-                                flagUser.value = flag
-                                if (flagUser.value == true) {
-//                                navController.navigate("MainPage")
+                                coroutineScope.launch {
+                                    val flag = viewModel.AuthorizationUser(emailUser.value, passwordUser.value) // авторизация пользователя
+                                    flagUser.value = flag
+                                    if (flagUser.value == true) {
+                                        navController.navigate("ManagementPage")
+                                    }
                                 }
-                            }
                             } else {
                                 viewModel.ShowInvalidEmailDialog() // отображение диалогового окна с ошибкой ввода email
                             }
@@ -240,7 +242,7 @@ class AuthorizationClass(private val context: Context) {
                     modifier = Modifier.fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(13.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF87CEEB)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF87CEEB))
                 ) {
                     Text(
                         "Войти",

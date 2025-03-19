@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sportsstore.display.screens.authorization.AuthorizationClass
+import com.example.sportsstore.display.screens.managementPage.ManagementPage
 import com.example.sportsstore.display.view.screens.RegistrationClass
 
 class NavigationClass(private val context: Context) {
@@ -20,6 +21,7 @@ class NavigationClass(private val context: Context) {
         ) {
             composable("Registration") { RegistrationClass(context).Registration(navController) }
             composable("Authorization") { AuthorizationClass(context).Authorization(navController) }
+            composable("ManagementPage") { ManagementPage() }
         }
     }
 }

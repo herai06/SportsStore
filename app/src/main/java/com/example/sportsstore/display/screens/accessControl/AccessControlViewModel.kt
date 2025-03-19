@@ -41,11 +41,7 @@ class AccessControlViewModel(private val context: Context) : ViewModel() {
     }
 
     // функция регистрации нового пользователя в базу данных
-    suspend fun RegistrationNewUser(
-        emailUser: String,
-        passwordUser: String,
-        nameUser: String
-    ): Boolean {
+    suspend fun RegistrationNewUser( emailUser: String, passwordUser: String, nameUser: String): Boolean {
         return try {
             // регистрация пользователя в "auth"
             val authResponse = withContext(Dispatchers.IO) {
